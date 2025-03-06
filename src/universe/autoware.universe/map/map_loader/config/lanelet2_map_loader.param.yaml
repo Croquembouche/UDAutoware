@@ -1,0 +1,9 @@
+/**:
+  ros__parameters:
+    lanelet2_map_projector_type: local   # Options: MGRS, UTM, local
+    latitude: 35.22312494055522
+    longitude: 138.8024583466017
+    # latitude: 35.223020250220955        # Latitude of map_origin, using in UTM
+    # longitude: 138.80235625950382       # Longitude of map_origin, using in UTM
+
+    center_line_resolution: 5.0         # [m]
