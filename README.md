@@ -3,7 +3,7 @@
 2. Setup Docker and Rocker
 3. docker pull williamhecoin/blueice:hydrau-env
 4. ```
-   sudo rocker --x11 --nvidia --network=host --volume {pathtodirectory}/UDAutoware:/home/carla/autoware --volume {pathtodirectory}/UDAutoware/autoware_map:/home/carla/autoware_map -- williamhecoin/blueice:hydrauenv
+   sudo rocker --x11 --nvidia --network=host --volume {pathtodirectory}/UDAutoware:/home/carla/autoware --volume {pathtodirectory}/UDAutoware/autoware_map:/home/carla/autoware_map -- williamhecoin/blueice:hydrau-env
    ```
 5. Once inside the container:
    ```
