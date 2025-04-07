@@ -22,10 +22,10 @@
         <param name="object_centric_pointcloud" value="false"/>
         <param name="use_base_link_z" value="$(var use_base_link_z)"/>
       </node>
-      <include file="$(find-pkg-share shape_estimation)/launch/shape_estimation.launch.xml">
+      <!-- <include file="$(find-pkg-share shape_estimation)/launch/shape_estimation.launch.xml">
         <arg name="input/objects" value="/perception/object_recognition/detection/labeled_clusters"/>
         <arg name="output/objects" value="/perception/object_recognition/detection/objects_with_feature"/>
-      </include>
+      </include> -->
     </group>
     <group unless="$(var real)">
       <node pkg="dummy_perception_publisher" exec="dummy_perception_publisher_node" name="dummy_perception_publisher" output="screen">
@@ -43,9 +43,9 @@
     </group>
 
     <!-- convert DynamicObjectsWithFeatureArray to DynamicObjects -->
-    <include file="$(find-pkg-share detected_object_feature_remover)/launch/detected_object_feature_remover.launch.xml">
+    <!-- <include file="$(find-pkg-share detected_object_feature_remover)/launch/detected_object_feature_remover.launch.xml">
       <arg name="input" value="/perception/object_recognition/detection/objects_with_feature"/>
       <arg name="output" value="/perception/object_recognition/detection/objects"/>
-    </include>
+    </include> -->
   </group>
 </launch>
