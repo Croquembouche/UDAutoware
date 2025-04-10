@@ -23,6 +23,6 @@
       longitudinal_max_acc: 9.8
       longitudinal_min_acc: -9.8
       steering: 1.414
-      steering_rate: 10.0
+      steering_rate: 100.0
       velocity_deviation: 100.0
       distance_deviation: 100.0

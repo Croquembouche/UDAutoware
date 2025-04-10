@@ -30,6 +30,9 @@
 #include "ugv_sdk/utilities/protocol_detector.hpp"
 #include "hunter_msgs/msg/hunter_status.hpp"
 #include "hunter_msgs/msg/hunter_light_cmd.hpp"
+#include "autoware_auto_vehicle_msgs/msg/steering_report.hpp"
+#include "autoware_auto_vehicle_msgs/msg/velocity_report.hpp"
+#include "autoware_auto_control_msgs/msg/ackermann_control_command.hpp"
 
 namespace westonrobot {
 
@@ -84,14 +87,22 @@ class HunterMessenger {
     tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(node_);
     odom_pub_ = node_->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>(odom_topic_name_, 50);
     pose_pub_ = node_->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>("/sensing/gnss/pose_with_covariance", 50);
-    status_pub_ = node_->create_publisher<hunter_msgs::msg::HunterStatus>(
-        "/hunter_status", 10);
+    status_pub_ = node_->create_publisher<hunter_msgs::msg::HunterStatus>("/hunter_status", 10);
+    steering_pub_ = node_->create_publisher<autoware_auto_vehicle_msgs::msg::SteeringReport>("/vehicle/status/steering_status", 10);
+    velocity_pub_ = node_->create_publisher<autoware_auto_vehicle_msgs::msg::VelocityReport>("/vehicle/status/velocity_status", 10);
+      
 
     // cmd subscriber
     motion_cmd_sub_ = node_->create_subscription<geometry_msgs::msg::Twist>(
         "/cmd_vel", 10,
         std::bind(&HunterMessenger::TwistCmdCallback, this,
                   std::placeholders::_1));
+    
+    // autoware cmd subscriber
+    autoware_cmd_sub_ = node_->create_subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>(
+      "/control/trajectory_follower/control_cmd", 10,
+      std::bind(&HunterMessenger::AckermanCmdCallback, this,
+                std::placeholders::_1));
 
     
   }
@@ -152,6 +163,20 @@ class HunterMessenger {
 
     status_pub_->publish(status_msg);
 
+    // publish steering report and velocity report
+    autoware_auto_vehicle_msgs::msg::SteeringReport steering_msg;
+    steering_msg.stamp = current_time_;
+    steering_msg.steering_tire_angle = phi;
+    steering_pub_->publish(steering_msg);
+
+    autoware_auto_vehicle_msgs::msg::VelocityReport velocity_msg;
+    velocity_msg.header.stamp = current_time_;
+    velocity_msg.header.frame_id = "base_link";
+    velocity_msg.longitudinal_velocity = state.motion_state.linear_velocity;
+    velocity_msg.lateral_velocity = 0.0;
+    velocity_msg.heading_rate = 0.0;
+    velocity_pub_->publish(velocity_msg);
+
     // publish odometry and tf
     PublishOdometryToROS(state.motion_state, dt);
 
@@ -180,8 +205,11 @@ class HunterMessenger {
   rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>::SharedPtr odom_pub_;
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr pose_pub_;
   rclcpp::Publisher<hunter_msgs::msg::HunterStatus>::SharedPtr status_pub_;
+  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::SteeringReport>::SharedPtr steering_pub_;
+  rclcpp::Publisher<autoware_auto_vehicle_msgs::msg::VelocityReport>::SharedPtr velocity_pub_;
 
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr motion_cmd_sub_;
+  rclcpp::Subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>::SharedPtr autoware_cmd_sub_;
   
 
   std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
@@ -199,6 +227,16 @@ class HunterMessenger {
 
   rclcpp::Time last_time_;
   rclcpp::Time current_time_;
+
+  void AckermanCmdCallback(const autoware_auto_control_msgs::msg::AckermannControlCommand::SharedPtr msg) {
+    
+    geometry_msgs::msg::Twist twist_msg;
+    // twist_msg.linear.x = msg->longitudinal.speed;
+    twist_msg.linear.x = 0.1;
+    twist_msg.angular.z = 0.0-float(msg->lateral.steering_tire_angle);
+    std::cout << "Twist cmd received: " << twist_msg.angular.z << std::endl;
+    // TwistCmdCallback(std::make_shared<geometry_msgs::msg::Twist>(twist_msg));
+  } 
 
   void TwistCmdCallback(const geometry_msgs::msg::Twist::SharedPtr msg) {
     

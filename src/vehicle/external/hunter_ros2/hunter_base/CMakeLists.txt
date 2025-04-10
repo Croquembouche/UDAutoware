@@ -25,6 +25,8 @@ find_package(sensor_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(autoware_auto_vehicle_msgs REQUIRED)
+find_package(autoware_auto_control_msgs REQUIRED)
 
 find_package(hunter_msgs REQUIRED)
 find_package(ugv_sdk REQUIRED)
@@ -47,6 +49,8 @@ set(DEPENDENCIES
   "hunter_msgs"
   "sensor_msgs"
   "tf2_geometry_msgs"
+  "autoware_auto_vehicle_msgs"
+  "autoware_auto_control_msgs"
 )
 
 
@@ -55,7 +59,7 @@ add_executable(hunter_base_node
     src/hunter_base_node.cpp
     src/bicycle_model.cpp)
 target_link_libraries(hunter_base_node ugv_sdk ${dependencies} ascent)
-ament_target_dependencies(hunter_base_node rclcpp tf2 tf2_ros std_msgs nav_msgs sensor_msgs hunter_msgs tf2_geometry_msgs ${dependencies})
+ament_target_dependencies(hunter_base_node rclcpp tf2 tf2_ros std_msgs nav_msgs sensor_msgs hunter_msgs tf2_geometry_msgs autoware_auto_control_msgs autoware_auto_vehicle_msgs ${dependencies})
 
 install(TARGETS hunter_base_node
   DESTINATION lib/${PROJECT_NAME})

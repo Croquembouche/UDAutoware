@@ -982,7 +982,8 @@ bool BehaviorPathPlannerNode::isDataReady()
   }
 
   if (!planner_data_->operation_mode) {
-    return missing("operation_mode");
+    return true;
+    // return missing("operation_mode");
   }
 
   return true;
